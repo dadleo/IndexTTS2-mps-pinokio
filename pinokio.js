@@ -1,8 +1,8 @@
 const path = require('path')
 module.exports = {
   version: "3.7",
-  title: "IndexTTS2.git",
-  description: "",
+  title: "IndexTTS-2",
+  description: "Emotionally Expressive and Duration-Controlled Auto-Regressive Zero-Shot Text-to-Speech application",
   icon: "icon.png",
   menu: async (kernel, info) => {
     let installed = info.exists("app/env")
