@@ -8,7 +8,7 @@ module.exports = {
         env: { },
         path: "app",
         message: [
-          "python webui.py --host 127.0.0.1 --deepspeed",
+          "python webui.py --host 127.0.0.1",
         ],
         on: [{
           "event": "/http:\/\/\\S+/",
