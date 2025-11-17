@@ -1,38 +1,26 @@
 module.exports = {
   install: async (cli) => {
-    // --- DEBUG STEP 1: Confirm Pinokio can execute basic shell commands ---
-    await cli.run({
-      message: "Debug: Installation script initiated successfully.",
-      method: "shell",
-      params: "echo 'Script started and shell is active.'",
+    // 1. Declare the cloning and basic dependency installation (Pinokio handles pathing implicitly here)
+    // This high-level call should prevent the immediate hang experienced with manual 'git clone' shell calls.
+    await cli.install({
+      name: "IndexTTS2 Core",
+      source: "https://github.com/dadleo/index-tts-mps",
+      params: [
+        {
+          method: "pip",
+          // Install all dependencies inside the cloned directory (index-tts-mps)
+          params: "install -r requirements.txt", 
+          // Note: Pinokio often handles the implicit 'cd' into the cloned directory
+        }
+      ]
     });
 
-    // --- DEBUG STEP 2: Check if 'git' command is visible in the PATH ---
-    await cli.run({
-      message: "Debug: Checking path for 'git'...",
-      method: "shell",
-      params: "which git",
-    });
-
-    // 1. Clone the core repository (Using the simplest possible clone command)
-    await cli.run({
-      message: "Cloning IndexTTS2 core repository...",
-      method: "shell",
-      // Rely on default behavior to clone into 'index-tts-mps'
-      params: "git clone https://github.com/dadleo/index-tts-mps",
-    });
-
-    // 2. Navigate into the cloned repository
+    // 2. Navigate into the cloned repository to ensure the next command executes in the right place.
+    // If the hang persists, this step might need to be removed, but for pip operations, it's safer.
     await cli.cd("index-tts-mps");
 
-    // 3. Install all dependencies from requirements.txt
-    await cli.run({
-      message: "Installing Python dependencies...",
-      method: "pip",
-      params: "install -r requirements.txt",
-    });
-    
-    // 4. CRITICAL FIX: Force Reinstall PyTorch for MPS Acceleration
+    // 3. CRITICAL FIX: Force Reinstall PyTorch for MPS Acceleration
+    // This step must be explicit to ensure the Mac-specific binaries are pulled.
     await cli.run({
       message: "Force installing MPS-compatible PyTorch wheels...",
       method: "pip",
@@ -41,7 +29,7 @@ module.exports = {
   },
   
   run: async (cli) => {
-    // Navigate into the application folder to run the web UI
+    // Ensure we are in the application folder before running the web UI
     await cli.cd("index-tts-mps");
     
     // Run the web UI
