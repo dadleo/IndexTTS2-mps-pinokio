@@ -1,35 +1,41 @@
 module.exports = {
   install: async (cli) => {
-    // 1. Declare the cloning and basic dependency installation (Pinokio handles pathing implicitly here)
-    // This high-level call should prevent the immediate hang experienced with manual 'git clone' shell calls.
-    await cli.install({
-      name: "IndexTTS2 Core",
-      source: "https://github.com/dadleo/index-tts-mps",
-      params: [
-        {
-          method: "pip",
-          // Install all dependencies inside the cloned directory (index-tts-mps)
-          params: "install -r requirements.txt", 
-          // Note: Pinokio often handles the implicit 'cd' into the cloned directory
-        }
-      ]
-    });
+    
+    const REPO_URL = "https://github.com/dadleo/index-tts-mps";
+    const REPO_DIR = "index-tts-mps";
+    const PYTORCH_INDEX = "https://download.pytorch.org/whl/cpu";
 
-    // 2. Navigate into the cloned repository to ensure the next command executes in the right place.
-    // If the hang persists, this step might need to be removed, but for pip operations, it's safer.
-    await cli.cd("index-tts-mps");
-
-    // 3. CRITICAL FIX: Force Reinstall PyTorch for MPS Acceleration
-    // This step must be explicit to ensure the Mac-specific binaries are pulled.
+    // Execute the entire installation sequence within a single, continuous shell run.
     await cli.run({
-      message: "Force installing MPS-compatible PyTorch wheels...",
-      method: "pip",
-      params: "install torch torchaudio torchvision --force-reinstall --extra-index-url https://download.pytorch.org/whl/cpu",
+      message: "Starting IndexTTS2 Installation (Cloning, Dependencies, and MPS Fix)...",
+      method: "shell",
+      params: `
+        # 1. Clone the repository
+        git clone ${REPO_URL} ${REPO_DIR}
+        
+        # Check if cloning succeeded
+        if [ ! -d "${REPO_DIR}" ]; then
+          echo "ERROR: Failed to clone repository ${REPO_URL}"
+          exit 1
+        fi
+        
+        # 2. Navigate to the repository directory
+        cd ${REPO_DIR}
+        
+        # 3. Install all dependencies from requirements.txt
+        pip install -r requirements.txt
+        
+        # 4. CRITICAL FIX: Force Reinstall PyTorch for MPS Acceleration
+        # This overwrites any non-MPS binaries installed in step 3.
+        pip install torch torchaudio torchvision --force-reinstall --extra-index-url ${PYTORCH_INDEX}
+        
+        echo "Installation complete."
+      `
     });
   },
   
   run: async (cli) => {
-    // Ensure we are in the application folder before running the web UI
+    // Navigate into the application folder to run the web UI
     await cli.cd("index-tts-mps");
     
     // Run the web UI
