@@ -29,6 +29,12 @@ tokenizers==0.21.0
 transformers==4.52.1
 tqdm
 
+# --- ADDED PYTORCH DEPENDENCIES FOR MPS COMPATIBILITY ---
+torch
+torchaudio
+torchvision
+# --------------------------------------------------------
+
 #deepspeed==0.17.1
 #WeTextProcessing; platform_machine != "Darwin"
 #wetext; platform_system == "Darwin"
