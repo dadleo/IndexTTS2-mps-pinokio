@@ -1,35 +1,47 @@
-module.exports = {
-  run: [
+{
+  "version": 1,
+  "description": "IndexTTS2 MPS Application Setup",
+  "dependencies": [
     {
-      method: "shell.run",
-      params: {
-        message: [
-          "git clone https://huggingface.co/spaces/IndexTeam/IndexTTS-2-Demo app",
-        ]
-      }
-    },
+      "method": "clone",
+      "params": "https://github.com/dadleo/index-tts-mps",
+      "branch": "main",
+      "description": "Cloning core IndexTTS2 repository"
+    }
+  ],
+  "runtime": {
+    "method": "python",
+    "version": "3.10"
+  },
+  "install": [
     {
-      method: "script.start",
-      params: {
-        uri: "torch.js",
-        params: {
-          venv: "env",
-          path: "app",
-          // xformers: true
-          // triton: true
-          // sageattention: true
+      "method": "shell",
+      "params": [
+        {
+          "method": "cd",
+          "params": "index-tts-mps"
+        },
+        {
+          "method": "pip",
+          "params": "install -r requirements.txt",
+          "description": "Install all dependencies"
+        },
+        {
+          "method": "pip",
+          "params": "install torch torchaudio torchvision --force-reinstall --extra-index-url https://download.pytorch.org/whl/cpu",
+          "description": "Force reinstall PyTorch using the CPU/Mac index to enable MPS acceleration."
         }
-      }
+      ]
+    }
+  ],
+  "run": [
+    {
+      "method": "cd",
+      "params": "index-tts-mps"
     },
     {
-      method: "shell.run",
-      params: {
-        venv: "env",
-        path: "app",
-        message: [
-          "uv pip install -r ../requirements.txt"
-        ]
-      }
-    },
+      "method": "python",
+      "params": "webui.py --port 7860"
+    }
   ]
 }
