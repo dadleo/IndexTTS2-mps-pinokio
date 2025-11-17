@@ -1,7 +1,7 @@
 const path = require('path')
 module.exports = {
   version: "3.7",
-  title: "IndexTTS-2",
+  title: "IndexTTS-2-mps",
   description: "Emotionally Expressive and Duration-Controlled Auto-Regressive Zero-Shot Text-to-Speech application",
   icon: "icon.png",
   menu: async (kernel, info) => {
